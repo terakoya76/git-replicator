@@ -1,0 +1,217 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Go CLI Tool Development - Cursor Rules
+
+## General Principles
+- Write idiomatic Go code following standard conventions
+- Prioritize clarity and maintainability over brevity
+- Use Go modules for dependency management
+- Follow semantic versioning for releases
+- Write comprehensive tests for all public functions
+
+## Project Structure
+```
+project/
+├── cmd/
+│   └── root.go          # Root command and CLI setup
+├── internal/
+│   ├── config/          # Configuration handling
+│   ├── handlers/        # Command handlers
+│   └── utils/           # Utility functions
+├── pkg/                 # Public packages (if needed)
+├── testdata/           # Test fixtures
+├── go.mod
+├── go.sum
+├── Makefile
+└── README.md
+```
+
+## CLI Framework
+- Use **cobra** for command structure and flag management
+- Use **viper** for configuration management
+- Use **logrus** or **slog** for structured logging
+- Consider **survey** for interactive prompts
+
+## Code Style Guidelines
+
+### Command Structure
+```go
+// Use cobra.Command with clear structure
+var rootCmd = &cobra.Command{
+    Use:   "myapp",
+    Short: "Brief description",
+    Long:  `Detailed description with examples`,
+    RunE:  runRoot,
+}
+
+func runRoot(cmd *cobra.Command, args []string) error {
+    // Always return errors, don't use os.Exit() directly
+    return nil
+}
+```
+
+### Error Handling
+- Always handle errors explicitly
+- Use `fmt.Errorf()` with `%w` verb for error wrapping
+- Create custom error types when appropriate
+- Don't panic in CLI applications - return errors instead
+
+```go
+if err := someOperation(); err != nil {
+    return fmt.Errorf("failed to perform operation: %w", err)
+}
+```
+
+### Configuration
+- Support multiple config sources: files, environment variables, flags
+- Use viper for configuration hierarchy
+- Validate configuration at startup
+- Provide sensible defaults
+
+### Logging
+- Use structured logging (logrus or slog)
+- Support log levels via flags (--verbose, --debug)
+- Log to stderr by default, stdout for actual output
+- Include context in log messages
+
+### Input/Output
+- Accept input from stdin when no files specified
+- Support common formats: JSON, YAML, CSV
+- Use `io.Reader` and `io.Writer` interfaces for testability
+- Implement proper signal handling for graceful shutdown
+
+## Testing Guidelines
+- Write table-driven tests
+- Test CLI commands using `cobra.Command.Execute()`
+- Mock external dependencies
+- Use `testdata/` directory for test fixtures
+- Aim for >80% test coverage
+
+```go
+func TestCommandExecution(t *testing.T) {
+    tests := []struct {
+        name     string
+        args     []string
+        expected string
+        wantErr  bool
+    }{
+        // test cases
+    }
+    
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            // test implementation
+        })
+    }
+}
+```
+
+## Dependencies Management
+- Keep dependencies minimal
+- Pin major versions in go.mod
+- Regularly update dependencies
+- Use `go mod tidy` before commits
+
+## Recommended Libraries
+```go
+// Core CLI
+"github.com/spf13/cobra"
+"github.com/spf13/viper"
+
+// Logging
+"github.com/sirupsen/logrus"
+// or "log/slog" (Go 1.21+)
+
+// Utilities
+"github.com/AlecAivazis/survey/v2"  // Interactive prompts
+"gopkg.in/yaml.v3"                 // YAML processing
+"github.com/fatih/color"           // Colored output
+```
+
+## Build and Release
+- Use Makefile for common tasks
+- Support cross-compilation
+- Use goreleaser for automated releases
+- Include version information in binary
+
+```makefile
+# Makefile example
+.PHONY: build test clean
+
+VERSION := $(shell git describe --tags --always --dirty)
+LDFLAGS := -ldflags "-X main.version=$(VERSION)"
+
+build:
+	go build $(LDFLAGS) -o bin/myapp ./cmd
+
+test:
+	go test -v ./...
+
+clean:
+	rm -rf bin/
+```
+
+## CLI Best Practices
+- Follow POSIX conventions for flags
+- Support `--help` and `-h` for all commands
+- Implement `--version` flag
+- Use consistent exit codes (0 for success, non-zero for errors)
+- Support `--quiet` and `--verbose` modes
+- Provide meaningful error messages with suggestions
+
+## Documentation
+- Include usage examples in command descriptions
+- Write clear README with installation and usage instructions
+- Use godoc comments for all public functions
+- Consider man pages for complex tools
+
+## Security Considerations
+- Validate all user inputs
+- Be careful with file paths (check for directory traversal)
+- Don't log sensitive information
+- Use secure defaults
+
+## Performance
+- Use buffered I/O for large files
+- Implement progress bars for long operations
+- Consider worker pools for concurrent processing
+- Profile memory usage for large datasets
+
+## Example Command Implementation
+```go
+package cmd
+
+import (
+    "fmt"
+    "github.com/spf13/cobra"
+    "github.com/spf13/viper"
+)
+
+var processCmd = &cobra.Command{
+    Use:   "process [file]",
+    Short: "Process input file",
+    Args:  cobra.MaximumNArgs(1),
+    RunE:  runProcess,
+}
+
+func init() {
+    processCmd.Flags().StringP("output", "o", "", "Output file")
+    processCmd.Flags().BoolP("verbose", "v", false, "Verbose output")
+    viper.BindPFlag("output", processCmd.Flags().Lookup("output"))
+}
+
+func runProcess(cmd *cobra.Command, args []string) error {
+    // Implementation here
+    return nil
+}
+```
+
+Remember to:
+- Always validate inputs
+- Handle edge cases gracefully  
+- Provide helpful error messages
+- Write tests for all functionality
+- Keep the CLI interface stable across versions
