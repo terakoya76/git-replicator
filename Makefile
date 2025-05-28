@@ -7,6 +7,9 @@ build:
 	go build $(LDFLAGS) -o bin/git-replicator main.go
 	chmod +x bin/git-replicator
 
+lint:
+	go fmt ./...
+
 test:
 	go test -v ./...
 

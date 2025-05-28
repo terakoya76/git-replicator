@@ -1,0 +1,144 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Pre-validation Code Suggestion Rules
+
+## Overview
+Before suggesting any code changes, modifications, or new implementations, you MUST validate that the changes will not break the existing codebase by running the project's quality assurance commands.
+
+## Pre-suggestion Validation Protocol
+
+### Mandatory Validation Steps
+Before providing ANY code suggestions, you MUST:
+
+1. **Build Validation**: Run `make build` to ensure the project compiles successfully
+2. **Lint Validation**: Run `make lint` to ensure code style and quality standards are met  
+3. **Test Validation**: Run `make test` to ensure all existing functionality remains intact
+
+### Validation Process
+```bash
+# Execute these commands in sequence
+make build
+make lint  
+make test
+```
+
+**All three commands MUST succeed (exit code 0) before proceeding with code suggestions.**
+
+### Response Format
+When providing code suggestions, always include the validation results:
+
+```markdown
+## Validation Results
+✅ Build: `make build` - PASSED
+✅ Lint: `make lint` - PASSED  
+✅ Test: `make test` - PASSED
+
+## Proposed Changes
+[Your code suggestions here]
+```
+
+If any validation fails:
+```markdown
+## Validation Results
+❌ Build: `make build` - FAILED
+❌ Lint: `make lint` - FAILED
+❌ Test: `make test` - FAILED
+
+## Issues Found
+[Describe the issues that need to be resolved first]
+
+## Recommendation
+Please resolve the existing issues before implementing new changes.
+```
+
+## Code Suggestion Guidelines
+
+### When All Validations Pass
+- Provide detailed code suggestions with explanations
+- Include impact analysis of proposed changes
+- Suggest additional tests if needed for new functionality
+- Ensure proposed changes follow existing code patterns and conventions
+
+### When Validations Fail
+- **DO NOT** provide new code suggestions
+- Focus on helping fix existing issues first
+- Provide debugging assistance for failed commands
+- Suggest incremental fixes to restore project health
+
+## Exception Handling
+
+### Alternative Make Targets
+If standard targets don't exist, try these alternatives in order:
+1. `npm run build`, `npm run lint`, `npm run test`
+2. `yarn build`, `yarn lint`, `yarn test`
+3. `gradle build`, `gradle check`, `gradle test`
+4. `mvn compile`, `mvn checkstyle:check`, `mvn test`
+5. Custom project-specific commands (check Makefile, package.json, or project docs)
+
+### No Build System
+If no build system is detected:
+- Document this limitation in your response
+- Proceed with extra caution
+- Emphasize the importance of manual testing
+- Recommend setting up proper build/test automation
+
+## Quality Assurance Principles
+
+### Code Integrity
+- Never suggest changes that might introduce regressions
+- Prioritize maintaining existing functionality over adding new features
+- Always consider backward compatibility
+
+### Incremental Changes
+- Suggest small, testable changes when possible
+- Break large changes into smaller, validatable steps
+- Ensure each step maintains project stability
+
+### Documentation Updates
+When suggesting code changes, also suggest:
+- README updates if interfaces change
+- Comment updates for modified functions
+- Test documentation for new test cases
+
+## Error Recovery
+
+### When Validation Commands Fail
+1. **Analyze the error output** from failed commands
+2. **Identify root causes** (missing dependencies, syntax errors, failing tests)
+3. **Suggest fixes** for the underlying issues
+4. **Re-run validations** after fixes are applied
+5. **Only then proceed** with original code suggestions
+
+### Continuous Validation
+- Re-run validations after implementing any suggested fixes
+- Ensure the project remains in a healthy state throughout the process
+- Stop and address issues immediately if new failures are introduced
+
+## Best Practices
+
+### Before Every Suggestion
+- Always run the validation trinity: build, lint, test
+- Check for any recent changes that might affect your suggestions
+- Consider the broader impact of proposed changes
+
+### Communication
+- Be transparent about validation results
+- Explain why certain suggestions are being delayed due to validation failures
+- Provide clear next steps for resolving issues
+
+### Collaboration
+- Work with the developer to establish a stable baseline first
+- Focus on one issue at a time when multiple validations fail
+- Celebrate when all validations pass and the project is healthy
+
+## Summary
+**No code suggestions without successful validation.** This rule ensures that:
+- Existing functionality is preserved
+- Code quality standards are maintained  
+- New changes build upon a solid foundation
+- Development workflow remains smooth and reliable
+
+Remember: A suggestion that breaks the build is worse than no suggestion at all.
