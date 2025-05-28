@@ -14,4 +14,7 @@ test:
 	go test -v ./...
 
 clean:
-	rm -rf bin/ 
+	rm -rf bin/
+
+deploy: build
+	sudo cp bin/git-replicator /usr/local/bin/.

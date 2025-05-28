@@ -1,4 +1,4 @@
-package handlers
+package handlers_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/terakoya76/git-replicator/internal/handlers"
 	"github.com/terakoya76/git-replicator/internal/utils"
 )
 
@@ -58,7 +59,7 @@ func TestGet(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				cleanupTestRepo(t, validRepoURL, tmpDir)
-				err := Get(context.Background(), tt.url, tmpDir)
+				err := handlers.Get(context.Background(), tt.url, tmpDir)
 				if tt.wantErr {
 					assert.Error(t, err)
 				} else {
@@ -77,7 +78,7 @@ func TestGet(t *testing.T) {
 		dir := getCloneDir(validRepoURL, tmpDir)
 		os.MkdirAll(filepath.Dir(dir), 0o755)
 		assert.NoError(t, os.Mkdir(dir, 0o755))
-		err := Get(context.Background(), validRepoURL, tmpDir)
+		err := handlers.Get(context.Background(), validRepoURL, tmpDir)
 		assert.Error(t, err)
 	})
 
@@ -89,7 +90,7 @@ func TestGet(t *testing.T) {
 		f, err := os.Create(filepath.Join(dir, "dummy.txt"))
 		assert.NoError(t, err)
 		f.Close()
-		err = Get(context.Background(), validRepoURL, tmpDir)
+		err = handlers.Get(context.Background(), validRepoURL, tmpDir)
 		assert.Error(t, err)
 	})
 
@@ -105,7 +106,7 @@ func TestGet(t *testing.T) {
 		f, err := os.Create(indexPath)
 		assert.NoError(t, err)
 		f.Close()
-		err = Get(context.Background(), validRepoURL, tmpDir)
+		err = handlers.Get(context.Background(), validRepoURL, tmpDir)
 		assert.NoError(t, err)
 	})
 
@@ -121,7 +122,7 @@ func TestGet(t *testing.T) {
 		f, err := os.Create(indexPath)
 		assert.NoError(t, err)
 		f.Close()
-		err = Get(context.Background(), validRepoURL, tmpDir)
+		err = handlers.Get(context.Background(), validRepoURL, tmpDir)
 		assert.Error(t, err)
 	})
 }

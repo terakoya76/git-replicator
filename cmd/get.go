@@ -3,11 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/terakoya76/git-replicator/internal/handlers"
+	"github.com/terakoya76/git-replicator/internal/utils"
 )
 
 var getCmd = &cobra.Command{
@@ -17,12 +16,11 @@ var getCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		url := args[0]
-		home, err := os.UserHomeDir()
+		rootDir, err := utils.GetGitReplicatorRoot()
 		if err != nil {
-			return fmt.Errorf("failed to get home directory: %w", err)
+			return fmt.Errorf("failed to get git-replicator root: %w", err)
 		}
-		baseDir := filepath.Join(home, "git-replicator")
-		if err := handlers.Get(ctx, url, baseDir); err != nil {
+		if err := handlers.Get(ctx, url, rootDir); err != nil {
 			return fmt.Errorf("failed to clone repository: %w", err)
 		}
 		return nil

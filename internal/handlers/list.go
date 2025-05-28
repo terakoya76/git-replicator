@@ -47,7 +47,7 @@ func List(ctx context.Context, baseDir string) ([]RepoInfo, error) {
 			}
 			return filepath.SkipDir
 		}
-		// それ以外は無視
+		// Ignore all other cases
 		return nil
 	})
 	if err != nil {

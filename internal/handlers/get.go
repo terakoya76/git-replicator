@@ -11,7 +11,7 @@ import (
 	"github.com/terakoya76/git-replicator/internal/utils"
 )
 
-func Get(ctx context.Context, url string, baseDir string) error {
+func Get(ctx context.Context, url string, rootDir string) error {
 	cloneURL := url
 	if !strings.HasSuffix(url, ".git") {
 		cloneURL = url + ".git"
@@ -22,7 +22,7 @@ func Get(ctx context.Context, url string, baseDir string) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse git url: %w", err)
 	}
-	dir := filepath.Join(baseDir, u.Host, u.Owner, u.Repo, "base")
+	dir := filepath.Join(rootDir, u.Host, u.Owner, u.Repo, "base")
 	gitIndex := filepath.Join(dir, ".git", "index")
 	if _, err := os.Stat(dir); err == nil {
 		// Directory exists, check if it's a git repo
@@ -48,10 +48,7 @@ func Get(ctx context.Context, url string, baseDir string) error {
 		return fmt.Errorf("directory %s exists but is not a git repo", dir)
 	}
 	// Directory does not exist, clone directly into the target directory
-	_, err = git.PlainCloneContext(ctx, dir, false, &git.CloneOptions{
-		URL:      cloneURL,
-		Progress: os.Stdout,
-	})
+	err = utils.DefaultCloneFunc(ctx, cloneURL, dir)
 	if err != nil {
 		return fmt.Errorf("git clone failed: %w", err)
 	}

@@ -3,23 +3,21 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/terakoya76/git-replicator/internal/handlers"
+	"github.com/terakoya76/git-replicator/internal/utils"
 )
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List repositories under $HOME/git-replicator",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		home, err := os.UserHomeDir()
+		rootDir, err := utils.GetGitReplicatorRoot()
 		if err != nil {
-			return fmt.Errorf("failed to get home directory: %w", err)
+			return fmt.Errorf("failed to get git-replicator root: %w", err)
 		}
-		baseDir := filepath.Join(home, "git-replicator")
-		repos, err := handlers.List(context.Background(), baseDir)
+		repos, err := handlers.List(context.Background(), rootDir)
 		if err != nil {
 			return fmt.Errorf("failed to list repositories: %w", err)
 		}

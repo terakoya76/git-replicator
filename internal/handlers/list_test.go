@@ -1,4 +1,4 @@
-package handlers
+package handlers_test
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/terakoya76/git-replicator/internal/handlers"
 )
 
 func TestList(t *testing.T) {
@@ -33,7 +34,7 @@ func TestList(t *testing.T) {
 		}
 	}
 
-	// 2階層リポジトリ（無視されるべき）
+	// Two-level repository (should be ignored)
 	twoLevelPath := filepath.Join(tmpDir, "gitlab.com", "repo3")
 	assert.NoError(t, os.MkdirAll(twoLevelPath, 0o755))
 
@@ -78,7 +79,7 @@ func TestList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repos, err := List(context.Background(), tt.baseDir)
+			repos, err := handlers.List(context.Background(), tt.baseDir)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Len(t, repos, 0)
