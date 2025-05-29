@@ -27,7 +27,11 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.git-replicator.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "enable verbose output")
-	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	err := viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	if err != nil {
+		slog.Error("failed to bind verbose flag", "err", err)
+		return
+	}
 	utils.InitLogger()
 }
 

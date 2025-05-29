@@ -48,10 +48,7 @@ type GitURLParts struct {
 
 func ParseGitURL(rawurl string) (GitURLParts, error) {
 	var u GitURLParts
-	urlStr := rawurl
-	if strings.HasSuffix(urlStr, ".git") {
-		urlStr = strings.TrimSuffix(urlStr, ".git")
-	}
+	urlStr := strings.TrimSuffix(rawurl, ".git")
 	if strings.HasPrefix(urlStr, "git@") {
 		parts := strings.SplitN(urlStr, ":", 2)
 		if len(parts) != 2 {

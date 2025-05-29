@@ -126,11 +126,18 @@ func TestSwitch(t *testing.T) {
 		},
 	}
 
-	os.Chdir(tmpDir)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			oldwd, _ := os.Getwd()
-			defer os.Chdir(oldwd)
+			oldwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
+			defer func() {
+				if err := os.Chdir(oldwd); err != nil {
+					t.Errorf("failed to chdir back: %v", err)
+				}
+			}()
+
 			if tt.prepare != nil {
 				tt.prepare(tmpDir, baseDir, branchDir)
 			}
@@ -139,7 +146,7 @@ func TestSwitch(t *testing.T) {
 				BranchName:        branchName,
 				GitReplicatorRoot: gitReplicatorRoot,
 			}
-			err := handlers.Switch(context.Background(), opts, tt.getRemoteURL, tt.cloneFunc, tt.switchBranchFunc)
+			err = handlers.Switch(context.Background(), opts, tt.getRemoteURL, tt.cloneFunc, tt.switchBranchFunc)
 			if tt.err != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.err.Error(), err.Error())
@@ -151,8 +158,12 @@ func TestSwitch(t *testing.T) {
 			}
 
 			// cleanup
-			os.RemoveAll(baseDir)
-			os.RemoveAll(branchDir)
+			if err := os.RemoveAll(baseDir); err != nil {
+				t.Errorf("failed to remove baseDir: %v", err)
+			}
+			if err := os.RemoveAll(branchDir); err != nil {
+				t.Errorf("failed to remove branchDir: %v", err)
+			}
 		})
 	}
 }

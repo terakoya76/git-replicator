@@ -77,7 +77,9 @@ func TestBuildRemoteURLFromRepoDir(t *testing.T) {
 	owner := "owner"
 	repo := "repo"
 	repoDir := filepath.Join(gitReplicatorRoot, host, owner, repo)
-	os.MkdirAll(repoDir, 0o755)
+	if err := os.MkdirAll(repoDir, 0o755); err != nil {
+		t.Fatalf("failed to mkdir repoDir: %v", err)
+	}
 
 	tests := []struct {
 		name    string

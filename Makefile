@@ -8,7 +8,7 @@ build:
 	chmod +x bin/git-replicator
 
 lint:
-	go fmt ./...
+	golangci-lint run
 
 test:
 	go test -v ./...

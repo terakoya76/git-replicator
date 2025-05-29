@@ -18,10 +18,14 @@ func TestFindRepoDir(t *testing.T) {
 	repoDir := filepath.Join(ownerDir, "repo")
 	baseDir := filepath.Join(repoDir, "base")
 	subDir := filepath.Join(baseDir, "subdir")
-	os.MkdirAll(subDir, 0o755)
+	if err := os.MkdirAll(subDir, 0o755); err != nil {
+		t.Fatalf("failed to mkdir subDir: %v", err)
+	}
 
 	branchDir := filepath.Join(repoDir, "branch")
-	os.MkdirAll(branchDir, 0o755)
+	if err := os.MkdirAll(branchDir, 0o755); err != nil {
+		t.Fatalf("failed to mkdir branchDir: %v", err)
+	}
 
 	tests := []struct {
 		name    string
