@@ -3,15 +3,19 @@
   "extends": [
     "config:recommended"
   ],
-  "labels": ["renovate"],
-  "enabledManagers": [
-    "gomod"
-  ],
+  "labels": ["dependencies"],
   "postUpdateOptions": [
     "gomodTidy"
   ],
   "packageRules": [
     {
+      groupName: 'github actions',
+      matchManagers: [
+        'github-actions',
+      ],
+    },
+    {
+      "groupName": "golang-modules-minor-patch-updates",
       "matchManagers": [
         "gomod"
       ],
@@ -21,8 +25,9 @@
       "matchUpdateTypes": [
         "patch",
         "minor"
-      ],
-      "groupName": "golang-modules-minor-patch-updates"
+      ]
+      // automerge: true,
+      // platformAutomerge: true
     }
   ]
 }
