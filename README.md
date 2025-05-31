@@ -44,6 +44,22 @@ $ git branch
   main
 $ popd
 
+# List branch directories under the current repository
+$ git-replicator branch
+base
+foo
+
+# Delete a branch directory under the current repository
+$ git-replicator delete foo
+Deleted branch directory: foo
+
+$ git-replicator switch foo
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Compressing objects: 100% (4/4), done.
+Total 5 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+cloned branch: foo to dir: /home/$USER/git-replicator/github.com/terakoya76/git-replicator-test/foo
+
 # From now on, you can let the agent use this directory as it pleases.
 # e.g. 
 # $ cursor ./foo/
@@ -53,6 +69,8 @@ $ popd
 - Clone a git repository into a structured local directory (`get <url>`)
 - List all managed repositories (`list`)
 - Clone current repo into a new branch directory (`switch <branch>`, like `git switch`)
+- List branch directories under the current repository (`branch`)
+- Delete a branch directory under the current repository (`delete <branch>`)
 
 ## Development
 

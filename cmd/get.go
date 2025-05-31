@@ -18,7 +18,7 @@ var getCmd = &cobra.Command{
 		url := args[0]
 		rootDir, err := utils.GetGitReplicatorRoot()
 		if err != nil {
-			return fmt.Errorf("failed to get git-replicator root: %w", err)
+			return fmt.Errorf("failed to get git-replicator root ($HOME/git-replicator): %w", err)
 		}
 		if err := handlers.Get(ctx, url, rootDir); err != nil {
 			return fmt.Errorf("failed to clone repository: %w", err)

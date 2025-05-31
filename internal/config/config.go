@@ -8,8 +8,6 @@ import (
 
 type Config struct {
 	// Add your configuration fields here
-	SourceRepo string `mapstructure:"source_repo"`
-	TargetRepo string `mapstructure:"target_repo"`
 }
 
 func Load() (*Config, error) {

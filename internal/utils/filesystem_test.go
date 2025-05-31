@@ -96,3 +96,98 @@ func TestFindRepoDir(t *testing.T) {
 		})
 	}
 }
+
+func TestGetGitReplicatorRoot(t *testing.T) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatalf("os.UserHomeDir() failed: %v", err)
+	}
+
+	want := filepath.Join(home, "git-replicator")
+	got, err := utils.GetGitReplicatorRoot()
+	if err != nil {
+		t.Errorf("GetGitReplicatorRoot() error = %v, want nil", err)
+	}
+	if got != want {
+		t.Errorf("GetGitReplicatorRoot() = %q, want %q", got, want)
+	}
+}
+
+func TestRemoveDir(t *testing.T) {
+	tmp := t.TempDir()
+
+	dirs := []struct {
+		name       string
+		prepare    func() string // returns the path to remove
+		wantErr    bool
+		checkAfter func(path string) error
+	}{
+		{
+			name: "remove directory with files and subdirs",
+			prepare: func() string {
+				dir := filepath.Join(tmp, "dir-with-files")
+				sub := filepath.Join(dir, "subdir")
+				if err := os.MkdirAll(sub, 0o755); err != nil {
+					t.Fatalf("failed to create subdir: %v", err)
+				}
+				if err := os.WriteFile(filepath.Join(dir, "file1.txt"), []byte("data"), 0o644); err != nil {
+					t.Fatalf("failed to create file1: %v", err)
+				}
+				return dir
+			},
+			wantErr: false,
+			checkAfter: func(path string) error {
+				_, err := os.Stat(path)
+				if !os.IsNotExist(err) {
+					return err
+				}
+				return nil
+			},
+		},
+		{
+			name: "remove non-existent directory",
+			prepare: func() string {
+				return filepath.Join(tmp, "not-exist-dir")
+			},
+			wantErr: false,
+			checkAfter: func(path string) error {
+				_, err := os.Stat(path)
+				if !os.IsNotExist(err) {
+					return err
+				}
+				return nil
+			},
+		},
+		{
+			name: "remove file (not directory)",
+			prepare: func() string {
+				file := filepath.Join(tmp, "file.txt")
+				if err := os.WriteFile(file, []byte("data"), 0o644); err != nil {
+					t.Fatalf("failed to create file: %v", err)
+				}
+				return file
+			},
+			wantErr: false, // os.RemoveAll does not error on files
+			checkAfter: func(path string) error {
+				_, err := os.Stat(path)
+				if !os.IsNotExist(err) {
+					return err
+				}
+				return nil
+			},
+		},
+	}
+
+	for _, tt := range dirs {
+		t.Run(tt.name, func(t *testing.T) {
+			path := tt.prepare()
+			err := utils.RemoveDir(path)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RemoveDir() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err := tt.checkAfter(path); err != nil {
+				t.Errorf("post-check failed: %v", err)
+			}
+		})
+	}
+}

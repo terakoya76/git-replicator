@@ -26,8 +26,16 @@ func FindRepoDir(cwd, gitReplicatorRoot string) (string, error) {
 			return dir, nil
 		}
 		if dir == gitReplicatorRoot || dir == "/" || dir == "." {
-			return "", fmt.Errorf("could not find repo directory under git-replicator root")
+			return "", fmt.Errorf("could not find repo directory, so move to the repo directory ($HOME/git-replicator/<host>/<owner>/<repo>)")
 		}
 		dir = parent
 	}
+}
+
+// RemoveDir deletes the specified directory and all its contents.
+func RemoveDir(dir string) error {
+	if err := os.RemoveAll(dir); err != nil {
+		return fmt.Errorf("failed to remove directory %s: %w", dir, err)
+	}
+	return nil
 }
