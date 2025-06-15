@@ -3,7 +3,7 @@ module github.com/terakoya76/git-replicator
 go 1.24.1
 
 require (
-	github.com/go-git/go-git/v5 v5.16.0
+	github.com/go-git/go-git/v5 v5.16.2
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
